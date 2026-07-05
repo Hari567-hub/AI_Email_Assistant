@@ -1,0 +1,14 @@
+# Secrets
+.env
+credentials.json
+token.json
+
+# Python
+__pycache__/
+*.pyc
+
+# VS Code
+.vscode/git rm --cached .env
+git rm --cached credentials.json
+git rm --cached token.json
+git rm -r --cached __pycache__
