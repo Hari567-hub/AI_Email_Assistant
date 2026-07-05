@@ -88,11 +88,11 @@ for msg in messages:
     print(result)
 
     service.users().messages().modify(
-    userId="me",
-    id=msg["id"],
-    body={
-        "removeLabelIds": ["UNREAD"]
-    }
-).execute()
+        userId="me",
+        id=msg["id"],
+        body={
+            "removeLabelIds": ["UNREAD"]
+        }
+    ).execute()
 
-print("✅ Email marked as read.")
+    print("✅ Email marked as read.")
