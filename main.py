@@ -86,3 +86,13 @@ for msg in messages:
     result = summarize_email(body[:3000])
 
     print(result)
+
+    service.users().messages().modify(
+    userId="me",
+    id=msg["id"],
+    body={
+        "removeLabelIds": ["UNREAD"]
+    }
+).execute()
+
+print("✅ Email marked as read.")
