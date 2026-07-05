@@ -1,18 +1,16 @@
-from __future__ import print_function
-from ai_helper import summarize_email
-import base64
-from email import message_from_bytes
 import os.path
-import base64
-from bs4 import BeautifulSoup
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
-# Read-only access to Gmail
-SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
+from email_parser import extract_body
+from ai_helper import summarize_email
+from config import SCOPES, MAX_EMAILS
+
+
+# ------------------ Gmail Authentication ------------------
 
 creds = None
 
@@ -24,7 +22,8 @@ if not creds or not creds.valid:
         creds.refresh(Request())
     else:
         flow = InstalledAppFlow.from_client_secrets_file(
-            "credentials.json", SCOPES
+            "credentials.json",
+            SCOPES
         )
         creds = flow.run_local_server(port=0)
 
@@ -33,84 +32,56 @@ if not creds or not creds.valid:
 
 service = build("gmail", "v1", credentials=creds)
 
+
+# ------------------ Read Emails ------------------
+
 results = service.users().messages().list(
     userId="me",
-    maxResults=1,
+    maxResults=MAX_EMAILS,
     labelIds=["INBOX"]
 ).execute()
 
 messages = results.get("messages", [])
 
 if not messages:
-    print("No messages found.")
-else:
-    print("Latest Emails:")
-    for msg in messages:
-        email = service.users().messages().get(
-            userId="me",
-            id=msg["id"]
-        ).execute()
+    print("No emails found.")
+    exit()
 
-        headers = email["payload"]["headers"]
+print("\nLatest Emails\n")
 
-        subject = "No Subject"
-        sender = "Unknown"
+for msg in messages:
 
-        for header in headers:
-            if header["name"] == "Subject":
-                subject = header["value"]
-            elif header["name"] == "From":
-                sender = header["value"]
+    email = service.users().messages().get(
+        userId="me",
+        id=msg["id"]
+    ).execute()
 
-        print("-" * 50)
-        print("From :", sender)
-        print("Subject :", subject)
-body = ""
+    payload = email["payload"]
 
-payload = email.get("payload", {})
-import json
+    headers = payload["headers"]
 
-print(json.dumps(payload, indent=2))
-def extract_body(parts):
-    for part in parts:
-        mime = part.get("mimeType")
+    subject = "No Subject"
+    sender = "Unknown"
 
-        if mime == "text/plain":
-            data = part["body"].get("data")
-            if data:
-                return base64.urlsafe_b64decode(data).decode("utf-8", errors="ignore")
+    for header in headers:
+        if header["name"] == "Subject":
+            subject = header["value"]
 
-        elif mime == "text/html":
-            data = part["body"].get("data")
-            if data:
-                html = base64.urlsafe_b64decode(data).decode("utf-8", errors="ignore")
-                soup = BeautifulSoup(html, "html.parser")
-                return soup.get_text(separator="\n")
+        elif header["name"] == "From":
+            sender = header["value"]
 
-        elif "parts" in part:
-            result = extract_body(part["parts"])
-            if result:
-                return result
+    body = extract_body(payload)
 
-    return ""
+    print("-" * 60)
+    print("From    :", sender)
+    print("Subject :", subject)
+    print()
 
-if "parts" in payload:
-    body = extract_body(payload["parts"])
-    print("=" * 60)
-    print("BODY LENGTH:", len(body))
-    print("=" * 60)
+    print("Email Preview:")
     print(body[:500])
-    print("=" * 60)
-else:
-    data = payload.get("body", {}).get("data")
-    
-    if data:
-        body = base64.urlsafe_b64decode(data).decode("utf-8", errors="ignore")
 
-        print("\nEmail Body:\n")
-        print("\nAnalyzing with Gemini...\n")
+    print("\nAI Summary:\n")
 
-        result = summarize_email(body[:3000])
+    result = summarize_email(body[:3000])
 
-        print(result)      # Print only the first 1000 characters
-        print("-" * 50)
+    print(result)
