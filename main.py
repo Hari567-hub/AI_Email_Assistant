@@ -1,4 +1,5 @@
 import os.path
+import time
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -37,8 +38,8 @@ service = build("gmail", "v1", credentials=creds)
 
 results = service.users().messages().list(
     userId="me",
-    maxResults=MAX_EMAILS,
-    labelIds=["INBOX"]
+    q="is:unread",
+    maxResults=MAX_EMAILS
 ).execute()
 
 messages = results.get("messages", [])
