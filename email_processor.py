@@ -1,14 +1,12 @@
 from gmail_helper import get_email, mark_as_read
 from email_parser import extract_body
 from ai_helper import summarize_email
+from notifier import notify
 
 
 def process_email(service, msg):
 
-    email = get_email(
-        service,
-        msg["id"]
-    )
+    email = get_email(service,msg["id"] )
 
     payload = email["payload"]
 
@@ -39,6 +37,8 @@ def process_email(service, msg):
     result = summarize_email(body[:3000])
 
     print(result)
+
+    notify(subject,result[:150])
 
     mark_as_read(service, msg["id"])
 

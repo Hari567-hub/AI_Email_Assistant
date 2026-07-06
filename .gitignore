@@ -13,3 +13,6 @@ git rm --cached credentials.json
 git rm --cached token.json
 git rm -r --cached __pycache__
 .vscode/
+
+# Runtime data
+processed.json
