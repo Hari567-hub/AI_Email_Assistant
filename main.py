@@ -12,15 +12,21 @@ from config import SCOPES, MAX_EMAILS
 
 service = authenticate()
 
-messages = get_unread_emails(service,MAX_EMAILS)
+try:
+    while True:
 
-if not messages:
-    print("No emails found.")
-    exit()
+        messages = get_unread_emails(service, MAX_EMAILS)
 
-print("\nLatest Emails\n")
+        if messages:
+            print("\nChecking for new emails...\n")
 
-for msg in messages:
-    process_email(service, msg)
+            for msg in messages:
+                process_email(service, msg)
+        else:
+            print("No new emails.")
 
-    
+        print("\nWaiting 10 seconds...\n")
+        time.sleep(10)
+
+except KeyboardInterrupt:
+    print("\n🛑 AI Email Agent stopped.")
