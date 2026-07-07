@@ -2,9 +2,13 @@ from gmail_helper import get_email, mark_as_read
 from email_parser import extract_body
 from ai_helper import summarize_email
 from notifier import notify
-
+from memory import is_processed, mark_processed
 
 def process_email(service, msg):
+
+    if is_processed(msg["id"]):
+        print("⏭️ Already processed.")
+        return
 
     email = get_email(service,msg["id"] )
 
@@ -36,24 +40,38 @@ def process_email(service, msg):
 
     result = summarize_email(body[:3000])
 
-    print("Summary      :", result["summary"])
-    print("Priority     :", result["priority"])
-    print("Category     :", result["category"])
+    print("=" * 60)
+    print("SUMMARY      :", result.get("summary", "N/A"))
+    print("CATEGORY     :", result.get("category", "N/A"))
+    print("PRIORITY     :", result.get("priority", "N/A"))
+    print("SCORE        :", result.get("importance_score", 0))
+    print("ACTION       :", result.get("requires_action", False))
+    print("REPLY        :", result.get("requires_reply", False))
+    print("DEADLINE     :", result.get("deadline", "None"))
+    if result.get("deadline"):
+        print("⏰ Reminder Needed")
+    print("NEXT STEP    :", result.get("next_action", "None"))
+    print("=" * 60)
 
     print("Action Items:")
-    for item in result["action_items"]:
+
+    for item in result.get("action_items", []):
         print(f"• {item}")
 
-    if result["priority"] == "HIGH":
-        
-        notify(f"🔴 {subject}",result["summary"])
+    if result.get("notify", False):
 
-    elif result["priority"] == "MEDIUM":
-        print("🟡 Medium priority email.")
+        notify(f"{subject} ({result.get('priority', 'UNKNOWN')})",result.get("summary", "No summary"))
 
     else:
-        print("⚪ Low priority email. Notification skipped.")
+        print("🔕 Notification skipped.")
 
-    mark_as_read(service, msg["id"])
+    if result.get("category") != "Error":
 
-    print("✅ Email marked as read.")
+        mark_as_read(service, msg["id"])
+        mark_processed(msg["id"])
+
+        print("✅ Email marked as read.")
+
+    else:
+
+        print("❌ AI processing failed.")

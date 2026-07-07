@@ -13,29 +13,41 @@ client = genai.Client(
 
 def summarize_email(email_text):
     prompt = f"""
-You are an AI Email Assistant.
+You are Hari's personal AI email assistant.
 
-Analyze the email and respond ONLY with valid JSON.
-
-Return exactly this format:
+Analyze the email and return ONLY valid JSON.
 
 {{
-    "summary": "...",
+    "summary": "One or two sentence summary",
+
+    "category": "Placement | Security | OTP | Finance | College | Shopping | Social | Personal | Spam | Other",
+
     "priority": "HIGH | MEDIUM | LOW",
-    "category": "...",
-    "action_items": [
-        "...",
-        "..."
-    ]
+
+    "importance_score": 0,
+
+    "requires_action": true,
+
+    "requires_reply": false,
+
+    "deadline": null,
+
+    "next_action": "What Hari should do next",
+
+    "notify": true
 }}
 
 Rules:
-- Return ONLY JSON.
-- Do not use markdown.
-- Do not use triple backticks.
-- Do not explain anything outside the JSON.
+
+1. importance_score must be between 0 and 100.
+2. notify should be false for advertisements and promotions.
+3. deadline should contain the date if one exists, otherwise null.
+4. Return ONLY JSON.
+5. No markdown.
+6. No explanations.
 
 Email:
+
 {email_text}
 """
 
