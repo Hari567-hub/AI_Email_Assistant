@@ -1,3 +1,4 @@
+import json
 import os
 from config import GEMINI_MODEL
 from dotenv import load_dotenv
@@ -14,11 +15,25 @@ def summarize_email(email_text):
     prompt = f"""
 You are an AI Email Assistant.
 
-Analyze the following email and return:
+Analyze the email and respond ONLY with valid JSON.
 
-Summary:
-Priority:
-Action Items:
+Return exactly this format:
+
+{{
+    "summary": "...",
+    "priority": "HIGH | MEDIUM | LOW",
+    "category": "...",
+    "action_items": [
+        "...",
+        "..."
+    ]
+}}
+
+Rules:
+- Return ONLY JSON.
+- Do not use markdown.
+- Do not use triple backticks.
+- Do not explain anything outside the JSON.
 
 Email:
 {email_text}
@@ -30,7 +45,20 @@ Email:
             contents=prompt
 )
         
-        return response.text
+        return json.loads(response.text)
+
+    except json.JSONDecodeError:
+        return {
+            "summary": "Failed to parse Gemini response.",
+            "priority": "LOW",
+            "category": "Unknown",
+            "action_items": []
+        }
 
     except Exception as e:
-        return f"Gemini Error:\n{e}"
+        return {
+            "summary": str(e),
+            "priority": "LOW",
+            "category": "Error",
+            "action_items": []
+    }

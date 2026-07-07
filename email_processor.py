@@ -36,9 +36,23 @@ def process_email(service, msg):
 
     result = summarize_email(body[:3000])
 
-    print(result)
+    print("Summary      :", result["summary"])
+    print("Priority     :", result["priority"])
+    print("Category     :", result["category"])
 
-    notify(subject,result[:150])
+    print("Action Items:")
+    for item in result["action_items"]:
+        print(f"• {item}")
+
+    if result["priority"] == "HIGH":
+        
+        notify(f"🔴 {subject}",result["summary"])
+
+    elif result["priority"] == "MEDIUM":
+        print("🟡 Medium priority email.")
+
+    else:
+        print("⚪ Low priority email. Notification skipped.")
 
     mark_as_read(service, msg["id"])
 
