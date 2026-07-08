@@ -3,6 +3,7 @@ from email_parser import extract_body
 from ai_helper import summarize_email
 from notifier import notify
 from memory import is_processed, mark_processed
+from reminder import add_reminder
 
 def process_email(service, msg):
 
@@ -49,8 +50,23 @@ def process_email(service, msg):
     print("REPLY        :", result.get("requires_reply", False))
     print("DEADLINE     :", result.get("deadline", "None"))
     if result.get("deadline"):
-        print("⏰ Reminder Needed")
+
+        add_reminder(subject,result["deadline"],result.get("next_action", ""))
+
+    print("📅 Reminder Saved")
     print("NEXT STEP    :", result.get("next_action", "None"))
+    if (
+        result.get("deadline")
+        and result.get("deadline") != "null"
+    ):
+
+        add_reminder(
+            subject,
+            result["deadline"],
+            result.get("next_action", "")
+        )
+
+        print("📅 Reminder Saved")
     print("=" * 60)
 
     print("Action Items:")
