@@ -2,7 +2,7 @@ import base64
 from bs4 import BeautifulSoup
 
 
-def decode_data(data):
+def decode_data(data: str) -> str:
     """Decode Gmail Base64 URL-safe data."""
     if not data:
         return ""
@@ -18,7 +18,7 @@ def decode_data(data):
         return ""
 
 
-def clean_html(html):
+def clean_html(html: str) -> str:
     """Convert HTML into readable text."""
     soup = BeautifulSoup(html, "html.parser")
 
@@ -40,7 +40,11 @@ def clean_html(html):
 
 def search_parts(part):
     """
-    Recursively search every MIME part.
+    Recursively traverse Gmail MIME parts and extract both
+    HTML and plain-text content.
+
+    Returns:
+        tuple[str, str]: (html, plain_text)
     """
 
     html = ""
@@ -71,7 +75,7 @@ def search_parts(part):
     return html, plain
 
 
-def extract_body(payload):
+def extract_body(payload: dict) -> str:
     """
     Return the best email body.
     """
@@ -80,5 +84,6 @@ def extract_body(payload):
 
     if html:
         return html
-
-    return plain
+    if plain:
+        return plain
+    return""

@@ -50,17 +50,29 @@ def get_unread_emails(service, max_results):
     Return unread emails.
     """
 
-    results = service.users().messages().list(
-        userId="me",
-        q="is:unread",
-        maxResults=max_results
-    ).execute()
+    try:
+        results = service.users().messages().list(
+            userId="me",
+            q="is:unread",
+            maxResults=max_results
+        ).execute()
 
-    return results.get("messages", [])
+        return results.get("messages", [])
+
+    except Exception as e:
+        print(f"❌ Gmail Error: {e}")
+        return []
 
 def get_email(service, message_id):
     """
-    Return a single email.
+    Fetch unread emails from the authenticated Gmail account.
+
+    Args:
+        service: Gmail API service object.
+        max_results: Maximum number of emails to fetch.
+
+    Returns:
+        List of unread email metadata.
     """
 
     email = service.users().messages().get(

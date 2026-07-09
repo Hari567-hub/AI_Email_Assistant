@@ -1,9 +1,9 @@
-from gmail_helper import get_email, mark_as_read
-from email_parser import extract_body
-from ai_helper import summarize_email
-from notifier import notify
-from memory import is_processed, mark_processed
-from reminder import add_reminder
+from gmail.gmail_helper import get_email, mark_as_read
+from gmail.email_parser import extract_body
+from ai.ai_helper import summarize_email
+from notification.notifier import notify
+from memory.memory import is_processed, mark_processed
+from memory.reminder import add_reminder
 
 def process_email(service, msg):
 
@@ -40,6 +40,8 @@ def process_email(service, msg):
     print("\nAI Summary:\n")
 
     result = summarize_email(body[:3000])
+
+    log_email(sender, subject, result)
 
     print("=" * 60)
     print("SUMMARY      :", result.get("summary", "N/A"))

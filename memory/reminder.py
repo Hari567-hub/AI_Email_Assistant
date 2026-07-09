@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 
 REMINDER_FILE = "reminders.json"
 
@@ -23,6 +24,13 @@ def add_reminder(subject, deadline, action):
 
     reminders = load_reminders()
 
+    for reminder in reminders:
+        if (
+            reminder["subject"] == subject
+            and reminder["deadline"] == deadline
+        ):
+            return
+
     reminders.append({
         "subject": subject,
         "deadline": deadline,
@@ -31,7 +39,7 @@ def add_reminder(subject, deadline, action):
 
     save_reminders(reminders)
 
-    def show_reminders():
+def show_reminders():
 
         reminders = load_reminders()
 
@@ -49,4 +57,28 @@ def add_reminder(subject, deadline, action):
             print(f"Action   : {reminder['action']}")
             print("-" * 50)
 
-        print()
+        print()   
+
+def remove_expired_reminders():
+
+        reminders = load_reminders()
+
+        today = datetime.today().date()
+
+        valid_reminders = []
+
+        for reminder in reminders:
+
+            try:
+                deadline = datetime.strptime(
+                    reminder["deadline"],
+                    "%Y-%m-%d"
+                ).date()
+
+                if deadline >= today:
+                    valid_reminders.append(reminder)
+
+            except:
+                valid_reminders.append(reminder)
+
+        save_reminders(valid_reminders)
