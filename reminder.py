@@ -30,3 +30,23 @@ def add_reminder(subject, deadline, action):
     })
 
     save_reminders(reminders)
+
+    def show_reminders():
+
+        reminders = load_reminders()
+
+        if not reminders:
+            print("📅 No pending reminders.\n")
+            return
+
+        print("\n📅 Pending Reminders")
+        print("=" * 50)
+
+        for reminder in reminders:
+
+            print(f"Subject  : {reminder['subject']}")
+            print(f"Deadline : {reminder['deadline']}")
+            print(f"Action   : {reminder['action']}")
+            print("-" * 50)
+
+        print()

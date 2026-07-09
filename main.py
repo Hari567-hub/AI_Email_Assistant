@@ -8,9 +8,12 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from gmail_helper import (authenticate,get_unread_emails,get_email,mark_as_read)
 from config import SCOPES, MAX_EMAILS
+from reminder import show_reminders
 
 
 service = authenticate()
+
+show_reminders()
 
 try:
     while True:
