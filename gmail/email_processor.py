@@ -5,15 +5,28 @@ from notification.notifier import notify
 from memory.memory import is_processed, mark_processed
 from memory.reminder import add_reminder
 
+"""
+Process a single unread Gmail message.
+
+Steps:
+1. Skip if already processed.
+2. Extract email details.
+3. Analyze using Gemini.
+4. Save reminders if needed.
+5. Notify the user.
+6. Mark the email as read.
+7. Store it in memory.
+"""
+
 def process_email(service, msg):
 
     if is_processed(msg["id"]):
         print("⏭️ Already processed.")
         return
 
-    email = get_email(service,msg["id"] )
+    email_data = get_email(service,msg["id"] )
 
-    payload = email["payload"]
+    payload = email_data["payload"]
 
     headers = payload["headers"]
 
@@ -41,7 +54,7 @@ def process_email(service, msg):
 
     result = summarize_email(body[:3000])
 
-    log_email(sender, subject, result)
+    #log_email(sender, subject, result)
 
     print("=" * 60)
     print("SUMMARY      :", result.get("summary", "N/A"))
@@ -51,24 +64,14 @@ def process_email(service, msg):
     print("ACTION       :", result.get("requires_action", False))
     print("REPLY        :", result.get("requires_reply", False))
     print("DEADLINE     :", result.get("deadline", "None"))
-    if result.get("deadline"):
+
+    print("NEXT STEP    :", result.get("next_action", "None"))
+    if (result.get("deadline")and result.get("deadline") != "null"):
 
         add_reminder(subject,result["deadline"],result.get("next_action", ""))
+        print("📅 Reminder saved.")
 
-    print("📅 Reminder Saved")
-    print("NEXT STEP    :", result.get("next_action", "None"))
-    if (
-        result.get("deadline")
-        and result.get("deadline") != "null"
-    ):
-
-        add_reminder(
-            subject,
-            result["deadline"],
-            result.get("next_action", "")
-        )
-
-        print("📅 Reminder Saved")
+        
     print("=" * 60)
 
     print("Action Items:")
