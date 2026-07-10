@@ -1,3 +1,9 @@
+"""
+Manage processed email IDs.
+
+This module stores the IDs of emails that have already
+been processed so they are not analyzed again.
+"""        
 import json
 import os
 
@@ -8,13 +14,20 @@ def load_memory():
     if not os.path.exists(MEMORY_FILE):
         return []
 
-    with open(MEMORY_FILE, "r") as file:
-        return json.load(file)
+    try:
+        with open(MEMORY_FILE, "r") as file:
+            return json.load(file)
+
+    except (json.JSONDecodeError, OSError):
+        return []
 
 
 def save_memory(memory):
-    with open(MEMORY_FILE, "w") as file:
-        json.dump(memory, file, indent=4)
+    try:
+        with open(MEMORY_FILE, "w") as file:
+            json.dump(memory, file, indent=4)
+    except OSError:
+        pass
 
 
 def is_processed(message_id):

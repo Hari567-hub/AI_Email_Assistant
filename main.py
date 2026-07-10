@@ -1,9 +1,14 @@
-import os.path
+"""
+Main entry point for the AI Email Assistant.
+
+Initializes Gmail, loads reminders,
+and continuously monitors unread emails.
+"""
 import time
 
 from gmail.email_processor import process_email
 from gmail.gmail_helper import (authenticate,get_unread_emails)
-from config import SCOPES, MAX_EMAILS, CHECK_INTERVAL
+from config import MAX_EMAILS, CHECK_INTERVAL
 from memory.reminder import (show_reminders,remove_expired_reminders)
 
 print("=" * 60)
@@ -31,7 +36,7 @@ try:
         else:
             print("No new emails.")
 
-        print("\nWaiting 10 seconds...\n")
+        print(f"\nWaiting {CHECK_INTERVAL} seconds...\n")
         time.sleep(CHECK_INTERVAL)
 
 except KeyboardInterrupt:

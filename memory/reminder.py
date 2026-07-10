@@ -1,3 +1,10 @@
+
+"""
+Manage email reminders.
+
+This module stores, displays, and removes reminders
+generated from important emails.
+"""
 import json
 import os
 from datetime import datetime
@@ -13,12 +20,13 @@ def load_reminders():
     with open(REMINDER_FILE, "r") as file:
         return json.load(file)
 
-
 def save_reminders(reminders):
+    """
+    Save reminders to disk.
+    """
 
     with open(REMINDER_FILE, "w") as file:
         json.dump(reminders, file, indent=4)
-
 
 def add_reminder(subject, deadline, action):
 
@@ -41,44 +49,44 @@ def add_reminder(subject, deadline, action):
 
 def show_reminders():
 
-        reminders = load_reminders()
+    reminders = load_reminders()
 
-        if not reminders:
-            print("📅 No pending reminders.\n")
-            return
+    if not reminders:
+        print("📅 No pending reminders.\n")
+        return
 
-        print("\n📅 Pending Reminders")
-        print("=" * 50)
+    print("\n📅 Pending Reminders")
+    print("=" * 50)
 
-        for reminder in reminders:
+    for reminder in reminders:
 
-            print(f"Subject  : {reminder['subject']}")
-            print(f"Deadline : {reminder['deadline']}")
-            print(f"Action   : {reminder['action']}")
-            print("-" * 50)
+        print(f"Subject  : {reminder['subject']}")
+        print(f"Deadline : {reminder['deadline']}")
+        print(f"Action   : {reminder['action']}")
+        print("-" * 50)
 
-        print()   
+    print()   
 
 def remove_expired_reminders():
 
-        reminders = load_reminders()
+    reminders = load_reminders()
 
-        today = datetime.today().date()
+    today = datetime.today().date()
 
-        valid_reminders = []
+    valid_reminders = []
 
-        for reminder in reminders:
+    for reminder in reminders:
 
-            try:
-                deadline = datetime.strptime(
-                    reminder["deadline"],
-                    "%Y-%m-%d"
-                ).date()
+        try:
+            deadline = datetime.strptime(
+                reminder["deadline"],
+                "%Y-%m-%d"
+            ).date()
 
-                if deadline >= today:
-                    valid_reminders.append(reminder)
-
-            except:
+            if deadline >= today:
                 valid_reminders.append(reminder)
 
-        save_reminders(valid_reminders)
+        except ValueError:
+            valid_reminders.append(reminder)
+
+    save_reminders(valid_reminders)
