@@ -1,4 +1,5 @@
 from assistant.system import show_help, show_about
+from gmail.email_monitor import check_emails_once
 def execute(command):
 
     if command == "help":
@@ -17,7 +18,7 @@ def execute(command):
 
     elif command == "email":
 
-        print("\n📧 Starting Email Monitor...")
+        check_emails_once()
 
         return True
 
