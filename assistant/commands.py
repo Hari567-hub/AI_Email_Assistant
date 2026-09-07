@@ -1,26 +1,30 @@
 from assistant.system import show_help, show_about
 from gmail.email_monitor import check_emails_once
+from core.router import route_command
+import os
+
+
 def execute(command):
 
-    if command == "help":
+    intent = route_command(command)
 
-        show_help()
-
-        return True
-
-
-    elif command == "about":
-
-        show_about()
-
-        return True
-
-
-    elif command == "email":
-
+    if intent == "EMAIL_CHECK":
         check_emails_once()
-
         return True
 
+    elif intent == "HELP":
+        show_help()
+        return True
+
+    elif intent == "ABOUT":
+        show_about()
+        return True
+
+    elif intent == "CLEAR":
+        os.system("cls")
+        return True
+
+    elif intent == "EXIT":
+        return True
 
     return False
