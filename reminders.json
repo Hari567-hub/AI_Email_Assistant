@@ -18,5 +18,10 @@
         "subject": "Manual Reminder",
         "deadline": "2026-09-09",
         "action": "apply for internship"
+    },
+    {
+        "subject": "Manual Reminder",
+        "deadline": "2026-09-08",
+        "action": "study dsa"
     }
 ]

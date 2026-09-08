@@ -6,16 +6,24 @@ def create_reminder(command):
 
     command = command.lower().strip()
 
-    if "tomorrow" not in command:
-        print("I currently support reminders for tomorrow.")
+    if "tomorrow" in command:
+        deadline = datetime.today() + timedelta(days=1)
+        keyword = "tomorrow"
+
+    elif "today" in command:
+        deadline = datetime.today()
+        keyword = "today"
+
+    else:
+        print("I currently support reminders for today or tomorrow.")
         return
 
-    task = command.split("tomorrow", 1)[1].strip()
+    task = command.split(keyword, 1)[1].strip()
 
     if task.startswith("to "):
         task = task[3:]
 
-    deadline = (datetime.today() + timedelta(days=1)).strftime("%Y-%m-%d")
+    deadline = deadline.strftime("%Y-%m-%d")
 
     add_reminder(
         "Manual Reminder",
