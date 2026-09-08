@@ -5,6 +5,9 @@ def route_command(command):
     if command in ["email", "emails", "inbox"]:
         return "EMAIL_CHECK"
 
+    elif command.startswith("remind me"):
+        return "CREATE_REMINDER"
+    
     elif "reminder" in command or "reminders" in command:
         return "REMINDER_LIST"
     
@@ -25,3 +28,7 @@ def route_command(command):
         return "EXIT"
 
     return "UNKNOWN"
+
+if __name__ == "__main__": 
+    print(route_command("remind me tomorrow to apply for internship"))
+print("ROUTER FILE IS RUNNING")
