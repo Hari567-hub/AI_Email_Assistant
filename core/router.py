@@ -5,10 +5,13 @@ def route_command(command):
     if command in ["email", "emails", "inbox"]:
         return "EMAIL_CHECK"
 
+    elif "reminder" in command or "reminders" in command:
+        return "REMINDER_LIST"
+    
     elif any(word in command for word in ["check", "show", "read"]):
         if any(word in command for word in ["email", "emails", "mail", "inbox"]):
             return "EMAIL_CHECK"
-
+    
     elif command in ["help", "?"]:
         return "HELP"
 
